@@ -184,6 +184,7 @@ def eeprom_read(
     eeprom: I2cPort, address: bytes, n: int = 1, command: Optional[bytes] = None
 ) -> tuple[bytearray, bytes]:
     eeprom.write((command or b"") + address)
+    sleep(0.01)
     return bytearray(eeprom.read(n)), (int.from_bytes(address, "big") + n).to_bytes(
         len(address), "big"
     )
@@ -201,7 +202,7 @@ def byte_address_parse(byte_str: str, max_size: Optional[int] = None) -> bytes:
 
 
 def manual_mode(eeprom: I2cPort, args: argparse.Namespace) -> str:
-    eeprom_i2c_config(eeprom, args.device["device"])
+    eeprom_i2c_startup(eeprom, args.device["device"])
     cur_address = b"\x00\x00"
     while True:
         choice = (
@@ -217,7 +218,7 @@ def manual_mode(eeprom: I2cPort, args: argparse.Namespace) -> str:
 
 
 def file_mode(eeprom: I2cPort, args: argparse.Namespace) -> str:
-    eeprom_i2c_config(eeprom, args.device["device"])
+    eeprom_i2c_startup(eeprom, args.device["device"])
     page_size = args.device["page_size"]
     commands = args.device["commands"]
     cur_address = b"\x00\x00"
@@ -245,6 +246,7 @@ def file_mode(eeprom: I2cPort, args: argparse.Namespace) -> str:
     )
     print(f"Image file: \n{image.hex(' ')}")
     print(f"Data on eeprom: \n{cur_eeprom_data.hex(' ')}")
+    eeprom_i2c_exit(eeprom, args.device["device"])
     if cur_eeprom_data == image:
         return "Successful eeprom flash"
     return "Unseccessful eeprom flash"
@@ -270,9 +272,24 @@ def parse_options(choice: str, opts: list[Any]) -> str:
             print(f"Invalid choice {e}")
 
 
-def eeprom_i2c_config(eeprom: I2cPort, device: str):
+def eeprom_i2c_startup(eeprom: I2cPort, device: str):
+    print(f"Startup sequence for {device}")
     if device == "ZL30267":
         eeprom_write(eeprom, b"\x00\x00", b"\x80", command=b"\x02")
+    sleep(0.1)
+
+
+def eeprom_i2c_exit(eeprom: I2cPort, device: str):
+    print(f"Exit sequence for {device}")
+    if device == "ZL30267":
+        eeprom_write(eeprom, b"\x00\x00", b"\x00", command=b"\x02")
+        sleep(3)
+        APPL1SR = eeprom_read(eeprom, b"\x00\x48", 1, command=b"\x03")
+        print(f"ALK 1 = {(APPL1SR[0][0] >> 2) & 1}")
+        sleep(1)
+        APPL2SR = eeprom_read(eeprom, b"\x00\x49", 1, command=b"\x03")
+        print(f"ALK 2 = {(APPL2SR[0][0] >> 2) & 1}")
+    sleep(0.1)
 
 
 def main() -> str:
@@ -295,7 +312,7 @@ def main() -> str:
         "-m",
         dest="mode",
         help="Selection of file or manual mode",
-        choices=["file", "manual", "f", "m"],
+        choices=["file", "manual", "test", "f", "m", "t"],
         type=str,
     )
     parser.add_argument(
@@ -341,6 +358,12 @@ def main() -> str:
             return file_mode(eeprom, args)
         elif args.mode in ["manual", "m"]:
             return manual_mode(eeprom, args)
+        elif args.mode in ["test", "t"]:
+            counter_bytes = bytearray()
+            for i in range(2036):
+                counter_bytes += (i % 255).to_bytes(1, "big")
+            args.image = counter_bytes
+            return file_mode(eeprom, args)
     else:
         choice = "Which mode do you want to use?"
         mode_opts = ["Manual Mode", "File Mode"]
