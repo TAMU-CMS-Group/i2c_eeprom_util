@@ -21,7 +21,7 @@ Supported Devices:
 
 ```bash
 # Clone the repo
-git clone https://github.com/fffooofoooo/i2c_eeprom_util.git
+git clone https://github.com/TAMU-CMS-Group/i2c_eeprom_util.git
 cd i2c_eeprom_util
 # build distribution artifacts
 uv build
