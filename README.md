@@ -10,10 +10,10 @@ Supported Devices:
 ---
 ## Table of Contents
 
-- [Installation](#installation)  
-- [Usage](#usage)  
-- [Options](#options)  
-- [Examples](#examples)  
+- [Installation](#installation)
+- [Usage](#usage)
+- [Options](#options)
+- [Examples](#examples)
 - [License](#license)
 
 ---
@@ -21,8 +21,8 @@ Supported Devices:
 
 ```bash
 # Clone the repo
-git clone https://github.com/you/my-tool.git
-cd my-tool
+git clone https://github.com/fffooofoooo/i2c_eeprom_util.git
+cd i2c_eeprom_util
 # build distribution artifacts
 uv build
 # install the wheel (preferred over sdist)
@@ -62,9 +62,9 @@ options:
 python3 i2c_eeprom_util.py 24LC32 0x50
 
 # Run program in file mode with ZL30267 with image.txt input to flash using it's default address of 0x74 (Changes depending on IC0, and IC1)
-python3 i2c_eeprom_util.py ZL30267 0x74 -zi image.txt -m f
+python3 i2c_eeprom_util.py ZL30267 0x75 -zi image.txt -m f
 # or
-python3 i2c_eeprom_util.py ZL30267 0x74 --zlimage image.txt --mode file
+python3 i2c_eeprom_util.py ZL30267 0x75 --zlimage image.txt --mode file
 ```
 
 ---

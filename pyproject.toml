@@ -1,6 +1,6 @@
 [project]
 name = "i2c_eeprom_util"
-version = "0.1.0"
+version = "0.1.1"
 description = "Script for flashing EEPROMs from an ft2232 over i2c"
 readme = "README.md"
 requires-python = ">=3.13"
