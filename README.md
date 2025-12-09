@@ -18,17 +18,26 @@ Supported Devices:
 
 ---
 ## Installation
+```bash
+# One line uv tool install with isolated environment
+uv tool install git+https://github.com/TAMU-CMS-Group/i2c_eeprom_util.git
+# One line uv pip install requires it's own environment
+uv pip install git+https://github.com/TAMU-CMS-Group/i2c_eeprom_util.git
+# Regular pip install also requires it's own environment
+pip install git+https://github.com/TAMU-CMS-Group/i2c_eeprom_util.git
+```
 
+## Developer Installation
 ```bash
 # Clone the repo
 git clone https://github.com/TAMU-CMS-Group/i2c_eeprom_util.git
 cd i2c_eeprom_util
 # build distribution artifacts
-uv build
-# install the wheel (preferred over sdist)
-pip install dist/i2c_eeprom_util-<version>-py3-none-any.whl
-# or install editable for development
-pip install -e .
+uv sync
+# source
+source .venv/bin/activate
+# or run from uv
+uv run i2c_eeprom_util --help
 ```
 
 ---
@@ -36,6 +45,8 @@ pip install -e .
 
 ```bash
 python3 i2c_eeprom_util.py --help
+or
+i2c_eeprom_util --help
 
 usage: I2C EEPROM Util [-h] [--mode {file,manual,f,m}] [--zlimage IMAGE]
                        [--debug]
